@@ -1,0 +1,60 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>{{ title }} Dashboard</title>
+<style>
+body{font-family:Arial,Helvetica,sans-serif;margin:0;background:#f4f6f8;color:#17202a}.wrap{max-width:1180px;margin:0 auto;padding:28px}.hero{background:#fff;border:1px solid #dfe4e8;border-radius:16px;padding:24px;margin-bottom:18px}.hero h1{margin:0 0 8px;font-size:30px}.hero p{margin:0;color:#5d6872}.grid{display:grid;grid-template-columns:1.05fr 1.4fr;gap:18px}.card{background:#fff;border:1px solid #dfe4e8;border-radius:16px;padding:20px}.metrics{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-bottom:14px}.metric{background:#f7f9fa;border-radius:12px;padding:14px}.metric b{display:block;font-size:20px;margin-top:5px}.nodes{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}.node{border:1px solid #e1e6ea;border-radius:12px;padding:12px}.bar{height:8px;background:#e7ebee;border-radius:10px;overflow:hidden;margin:7px 0}.fill{height:100%;background:#2f6f8f}.tag{display:inline-block;padding:3px 8px;border-radius:99px;background:#edf3f6;font-size:12px}.formrow{display:grid;grid-template-columns:1.5fr 1fr 1fr 1fr;gap:8px;margin-bottom:10px}.formrow input,.formrow select{width:100%;box-sizing:border-box;padding:10px;border:1px solid #cfd6dc;border-radius:8px}.btns{display:flex;gap:8px}.btn{border:0;border-radius:8px;padding:10px 14px;cursor:pointer}.primary{background:#1f5f7a;color:#fff}.secondary{background:#e8edf0}.tablewrap{overflow:auto;margin-top:12px}table{width:100%;border-collapse:collapse;font-size:13px}th,td{padding:8px;border-bottom:1px solid #e7eaed;text-align:left;white-space:nowrap}.small{font-size:12px;color:#68737d}.events{padding-left:18px}.notice{background:#fff8e8;border-left:4px solid #d6a33a;padding:12px;margin-top:14px;font-size:13px}@media(max-width:900px){.grid{grid-template-columns:1fr}.formrow{grid-template-columns:1fr 1fr}.nodes{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="hero">
+    <h1>EcoFlux PiCloud</h1>
+    <p>Energy-aware task scheduling for sustainable Raspberry Pi-based distributed computing</p>
+    <div class="notice"><b>Research mode:</b> this is a software model of the proposed architecture. Energy and carbon figures are model outputs, not physical Raspberry Pi measurements.</div>
+  </div>
+  <div class="grid">
+    <div class="card">
+      <h2>Submit Workload</h2>
+      <form method="post" action="/run">
+        <div class="formrow">
+          <input name="task_name" placeholder="Task name" value="Matrix Processing">
+          <input name="workload" type="number" min="1" max="100" value="60">
+          <select name="priority"><option value="1">High priority</option><option value="2" selected>Medium priority</option><option value="3">Low priority</option></select>
+          <input name="deadline" type="number" min="1" max="60" value="10" step="1" title="Deadline in seconds">
+        </div>
+        <div class="formrow">
+          <select name="mode"><option value="energy_aware" selected>EcoFlux energy-aware</option><option value="conventional">Conventional baseline</option></select>
+        </div>
+        <div class="btns"><button class="btn primary" type="submit">Run Task</button><button class="btn secondary" formaction="/reset" formmethod="post">Reset</button></div>
+      </form>
+      <p class="small">Workload = normalized task demand (1–100). Priority 1 is most urgent.</p>
+      <h3>Recent Scheduler Events</h3>
+      <ul class="events">{% for e in events %}<li>{{ e }}</li>{% else %}<li>No events yet.</li>{% endfor %}</ul>
+    </div>
+    <div class="card">
+      <h2>System State</h2>
+      <div class="metrics">
+        <div class="metric">Carbon intensity model<b>{{ carbon }} gCO₂/kWh</b></div>
+        <div class="metric">Renewable availability model<b>{{ renewable }}%</b></div>
+      </div>
+      <h3>Virtual Raspberry Pi Cluster</h3>
+      <div class="nodes">
+      {% for n in nodes %}
+        <div class="node"><b>{{ n.id }}</b> <span class="tag">{{ n.state }}</span><div class="small">Energy state: {{ n.energy }} / 100</div><div class="bar"><div class="fill" style="width:{{ n.energy }}%"></div></div><div class="small">Utilization: {{ n.utilization }}%</div><div class="bar"><div class="fill" style="width:{{ n.utilization }}%"></div></div><div class="small">Tasks completed: {{ n.tasks }}</div></div>
+      {% endfor %}
+      </div>
+    </div>
+  </div>
+  <div class="card" style="margin-top:18px">
+    <h2>Task History</h2>
+    <div class="tablewrap"><table><thead><tr><th>Task</th><th>Mode</th><th>Node</th><th>Workload</th><th>Priority</th><th>Model Energy</th><th>Carbon Model</th><th>Time Model</th><th>Status</th></tr></thead><tbody>
+    {% for r in history %}<tr><td>{{ r.task_name }}</td><td>{{ r.mode }}</td><td>{{ r.node }}</td><td>{{ r.workload }}</td><td>{{ r.priority }}</td><td>{{ r.energy_model_cost }}</td><td>{{ r.carbon_impact_model }}</td><td>{{ r.model_execution_time_s }} s</td><td>{{ r.status }}</td></tr>{% else %}<tr><td colspan="9">No task history yet. Run a task or execute run_demo.py.</td></tr>{% endfor %}
+    </tbody></table></div>
+    <p class="small">The CSV log can be used to generate paper figures and tables. Keep the “model” label in the paper.</p>
+  </div>
+</div>
+</body>
+</html>

@@ -1,0 +1,18 @@
+EcoFlux PiCloud — Clean Controlled Software-Model Experiment
+
+Dataset:
+6 Conventional Scheduling observations + 6 EcoFlux PiCloud observations.
+Same six tasks and task parameters are used in both modes.
+
+Important:
+All energy, carbon, and execution-time values are SOFTWARE-MODEL OUTPUTS.
+They are not physical Raspberry Pi measurements and should not be reported as measured Wh/W.
+
+Summary:
+Metric,Conventional Scheduling,EcoFlux PiCloud,Change
+Total model energy cost,15.358,15.260,-0.64%
+Average modeled execution time (s),1.669,1.745,4.54%
+Total modeled carbon impact,3.0105,2.9986,-0.40%
+Average node utilization (%),51.87,53.15,2.48%
+
+These results are suitable for a software-model/simulation-style comparative analysis.
